@@ -5,7 +5,7 @@ infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
 # Contract details
-contract_address = "YOUR_CONTRACT_ADDRESS"
+contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Example pseudo contract address
 contract_abi = [
     # Paste the ABI from your compiled contract
 ]
