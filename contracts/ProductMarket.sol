@@ -1,4 +1,7 @@
 
+//Compile and deploy this contract on a test network (e.g., Rinkeby or Goerli).
+//Save the contract’s ABI and address for use in the Django backend.
+
 pragma solidity ^0.8.0;
 
 contract ProductMarket {
