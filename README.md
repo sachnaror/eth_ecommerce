@@ -75,5 +75,7 @@ eth_ecommerce/
 Because… Why not? Ever wondered what e-commerce would look like if it was all on-chain? Now you don’t have to. Enjoy your Ethereum shopping sprees, because Web3 just made buying online nerdier than ever! 🚀
 
 Happy shopping! 🛒 (P.S. Don’t blame us if gas fees ruin the fun 🙈)
-<img src="resources/1.png" alt="Image 1" width="550" height="350">
-![Image 2](resources/2.png)
+
+
+<img src="resources/1.png" alt="Image 1" width="450" height="550">
+
