@@ -1,5 +1,5 @@
-# Adding views for listing products, adding new ones, and purchasing products.
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from web3 import Web3
 
 from .utils import create_product, purchase_product
@@ -9,67 +9,96 @@ infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"  # Replace wi
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
 # Contract details
-contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Using dummy Contract address
-contract_address = web3.to_checksum_address(contract_address)  # To Convert to checksum address
- # Replace with your deployed contract address
+contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Replace with your deployed contract address
+contract_address = web3.toChecksumAddress(contract_address)  # Convert to checksum address
 contract_abi = [
     {
-        "inputs": [{"internalType": "uint256", "name": "x", "type": "uint256"}],
-        "name": "set",
+        "inputs": [{"internalType": "string", "name": "name", "type": "string"},
+                   {"internalType": "uint256", "name": "price", "type": "uint256"}],
+        "name": "createProduct",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "get",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
+        "inputs": [{"internalType": "uint256", "name": "productId", "type": "uint256"}],
+        "name": "purchaseProduct",
+        "outputs": [],
+        "stateMutability": "payable",
         "type": "function"
     },
     {
-        "anonymous": False,
         "inputs": [],
-        "name": "StoredDataUpdated",
-        "type": "event"
-    }  # Paste the ABI from your compiled contract here
+        "name": "getProducts",
+        "outputs": [{"internalType": "tuple[]", "name": "", "type": "tuple(uint256,string,uint256)"}],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ]
 
 # Create contract instance
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
+
+@csrf_exempt
 def add_product(request):
-    # Get product name and price from the request
-    name = request.GET.get("name")
-    price = int(request.GET.get("price"))
+    if request.method == 'POST':
+        product_name = request.POST.get('name')
+        product_price = request.POST.get('price')
 
-    # Call the create_product function to interact with the smart contract
-    receipt = create_product(name, price)
+        # Validate product name
+        if not product_name or len(product_name.strip()) == 0:
+            return JsonResponse({'error': 'Invalid product name.'}, status=400)
 
-    # Return a JSON response with the transaction details
-    return JsonResponse({"status": "Product added", "transaction": receipt.transactionHash.hex()})
+        # Validate product price
+        try:
+            price = float(product_price)
+            if price <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'Invalid product price.'}, status=400)
 
+        # Interact with the smart contract to create a product
+        try:
+            # Here, you would need to specify the user's account address from the request
+            # You might need to pass the user's account address with your request
+            user_account = request.POST.get('account')  # Get the user's account from request
+            tx_receipt = contract.functions.createProduct(product_name, web3.toWei(price, 'ether')).transact({'from': user_account})
+            return JsonResponse({'status': 'Product added', 'transaction': tx_receipt.hex()}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+@csrf_exempt
 def buy_product(request):
-    # Get the product ID from the request
-    product_id = int(request.GET.get("product_id"))
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        user_account = request.POST.get('account')  # Get the user's account from request
 
-    # Call the purchase_product function to interact with the smart contract
-    receipt = purchase_product(product_id)
+        try:
+            receipt = contract.functions.purchaseProduct(int(product_id)).transact({
+                'from': user_account,
+                'value': web3.toWei(0.01, 'ether')  # Assuming a fixed purchase price
+            })
+            return JsonResponse({"status": "Purchase complete", "transaction": receipt.hex()})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
-    # Return a JSON response with the transaction details
-    return JsonResponse({"status": "Purchase complete", "transaction": receipt.transactionHash.hex()})
-
-from django.http import JsonResponse
-
-from .utils import get_data, set_data
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 
+@csrf_exempt
 def update_data_view(request):
-    value = request.GET.get("value")
-    account = request.GET.get("account")  # User's account address (from MetaMask)
+    if request.method == 'POST':
+        value = request.POST.get("value")
+        account = request.POST.get("account")  # User's account address (from MetaMask)
 
-    try:
-        receipt = set_data(int(value), account)
-        return JsonResponse({"status": "Data updated", "transaction": receipt.transactionHash.hex()})
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        try:
+            receipt = set_data(int(value), account)
+            return JsonResponse({"status": "Data updated", "transaction": receipt.transactionHash.hex()})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
