@@ -49,7 +49,8 @@ eth_ecommerce/
 
 3. **Set up Django** settings for Web3 and Ethereum, then run the server to launch this shopping adventure.
 
-4. Visit [http://127.0.0.1:8000/store/product/](http://127.0.0.1:8000/store/product/) and start shopping on-chain!
+4. Visit [http://127.0.0.1:8000/store/product/](http://127.0.0.1:8000/store/product/) and start shopping on-chain! Testing the Application : 1. Add a Product: Enter a product name and price, then click Add Product.
+	2.	Purchase a Product: Enter the product ID and click Purchase Product.
 
 ---
 

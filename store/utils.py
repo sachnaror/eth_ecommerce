@@ -28,10 +28,43 @@ contract_abi = [
         "name": "StoredDataUpdated",
         "type": "event"
     }
-    # Paste your ABI here
+
 ]
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+
+def set_data(value, account):
+    """Set the value in the contract."""
+    # Estimate gas required for the transaction
+    estimated_gas = contract.functions.set(value).estimateGas({'from': account})
+
+    # Fetch the current gas price
+    gas_price = web3.eth.gas_price
+
+    # Calculate total cost of the transaction
+    total_cost = estimated_gas * gas_price
+
+    # Check the balance of the account
+    balance = web3.eth.get_balance(account)
+
+    # Ensure the account has enough Ether to cover the total cost
+    if balance < total_cost:
+        raise Exception("Insufficient funds to cover gas fees.")
+
+    # Send the transaction
+    tx_hash = contract.functions.set(value).transact({
+        'from': account,
+        'gas': estimated_gas,
+        'gasPrice': gas_price
+    })
+
+    # Wait for the transaction receipt
+    receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+    return receipt
+
+def get_data():
+    """Get the value from the contract."""
+    return contract.functions.get().call()
 
 def create_product(name, price):
     """Function to create a new product on the blockchain."""

@@ -37,3 +37,18 @@ def buy_product(request):
 
     # Return a JSON response with the transaction details
     return JsonResponse({"status": "Purchase complete", "transaction": receipt.transactionHash.hex()})
+
+from django.http import JsonResponse
+
+from .utils import get_data, set_data
+
+
+def update_data_view(request):
+    value = request.GET.get("value")
+    account = request.GET.get("account")  # User's account address (from MetaMask)
+
+    try:
+        receipt = set_data(int(value), account)
+        return JsonResponse({"status": "Data updated", "transaction": receipt.transactionHash.hex()})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
