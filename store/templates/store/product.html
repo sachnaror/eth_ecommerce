@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ethereum E-Commerce App</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Product Store</h1>
+    <input type="text" id="productName" placeholder="Product Name">
+    <input type="number" id="productPrice" placeholder="Product Price in Wei">
+    <button onclick="addProduct()">Add Product</button>
+    <input type="number" id="productId" placeholder="Product ID to Purchase">
+    <button onclick="purchaseProduct()">Purchase Product</button>
+
+    <div id="result"></div>
+
+    <script>
+        const contractAddress = "YOUR_CONTRACT_ADDRESS";
+        const contractABI = [ /* Contract ABI goes here */ ];
+
+        const web3 = new Web3(window.ethereum);
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function addProduct() {
+            const name = document.getElementById("productName").value;
+            const price = document.getElementById("productPrice").value;
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+
+            contract.methods.createProduct(name, price).send({ from: account })
+                .then(receipt => {
+                    document.getElementById("result").innerText = "Product added! Tx: " + receipt.transactionHash;
+                });
+        }
+
+        async function purchaseProduct() {
+            const productId = document.getElementById("productId").value;
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+
+            contract.methods.purchaseProduct(productId).send({ from: account, value: web3.utils.toWei("0.01", "ether") })
+                .then(receipt => {
+                    document.getElementById("result").innerText = "Purchase complete! Tx: " + receipt.transactionHash;
+                });
+        }
+    </script>
+</body>
+</html>
