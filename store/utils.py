@@ -1,15 +1,14 @@
 from web3 import Web3
 
 # Connect to Ethereum node (e.g., Infura)
-infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"  # Replace with your Infura project ID
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
 # Contract details
-contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Using dummy Contract address
-contract_address = web3.to_checksum_address(contract_address)  # To Convert to checksum address
+contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Replace with your deployed contract address
+contract_address = web3.toChecksumAddress(contract_address)  # Convert to checksum address
 
-
-# ABI for the SimpleStorage contract
+# ABI for the Smart Contract (Replace with your actual contract ABI)
 contract_abi = [
     {
         "inputs": [{"internalType": "uint256", "name": "x", "type": "uint256"}],
@@ -69,14 +68,27 @@ def get_data():
     """Get the value from the contract."""
     return contract.functions.get().call()
 
-def create_product(name, price):
+def create_product(name, price, account):
     """Function to create a new product on the blockchain."""
-    tx_hash = contract.functions.createProduct(name, price).transact()
-    receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-    return receipt
+    try:
+        # Ensure price is valid
+        price_in_wei = web3.toWei(price, 'ether')
+        tx_hash = contract.functions.createProduct(name, price_in_wei).transact({'from': account})
+        receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        return receipt
+    except Exception as e:
+        raise Exception(f"Error creating product: {str(e)}")
 
-def purchase_product(product_id):
+def purchase_product(product_id, account):
     """Function to purchase a product from the blockchain store."""
-    tx_hash = contract.functions.purchaseProduct(product_id).transact()
-    receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-    return receipt
+    try:
+        # Assuming you know the price for the product, or retrieve it from the contract
+        product_price = web3.toWei(0.01, 'ether')  # Example price in Ether
+        tx_hash = contract.functions.purchaseProduct(product_id).transact({
+            'from': account,
+            'value': product_price
+        })
+        receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        return receipt
+    except Exception as e:
+        raise Exception(f"Error purchasing product: {str(e)}")
