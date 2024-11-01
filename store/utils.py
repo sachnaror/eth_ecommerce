@@ -5,8 +5,11 @@ infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
 # Contract details
-contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Your contract address
-contract_address = web3.toChecksumAddress(contract_address)  # Convert to checksum address
+contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Using dummy Contract address
+contract_address = web3.to_checksum_address(contract_address)  # To Convert to checksum address
+
+
+# ABI for the SimpleStorage contract
 contract_abi = [
     {
         "inputs": [{"internalType": "uint256", "name": "x", "type": "uint256"}],
@@ -28,9 +31,9 @@ contract_abi = [
         "name": "StoredDataUpdated",
         "type": "event"
     }
-
 ]
 
+# Create contract instance
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 def set_data(value, account):
