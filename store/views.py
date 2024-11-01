@@ -9,9 +9,30 @@ infura_url = "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID"  # Replace wi
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
 # Contract details
-contract_address = "YOUR_CONTRACT_ADDRESS"  # Replace with your deployed contract address
+contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Using dummy Contract address
+contract_address = web3.to_checksum_address(contract_address)  # To Convert to checksum address
+ # Replace with your deployed contract address
 contract_abi = [
-    # Paste the ABI from your compiled contract here
+    {
+        "inputs": [{"internalType": "uint256", "name": "x", "type": "uint256"}],
+        "name": "set",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "get",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "anonymous": False,
+        "inputs": [],
+        "name": "StoredDataUpdated",
+        "type": "event"
+    }  # Paste the ABI from your compiled contract here
 ]
 
 # Create contract instance

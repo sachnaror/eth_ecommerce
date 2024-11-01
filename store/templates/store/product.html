@@ -20,8 +20,28 @@
     <div id="result"></div>
 
     <script>
-        const contractAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with your actual contract address
-        const contractABI = [ /* Contract ABI goes here */ ]; // Replace with your contract ABI
+        const contractAddress = "0x1234567890abcdef1234567890abcdef12345678"; // Replace with your actual contract address
+        const contractABI = [ {
+            "inputs": [{"internalType": "uint256", "name": "x", "type": "uint256"}],
+            "name": "set",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "get",
+            "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "anonymous": False,
+            "inputs": [],
+            "name": "StoredDataUpdated",
+            "type": "event"
+        }/* Contract ABI goes here */
+        ]; // Replace with your contract ABI
 
         let web3;
         let contract;
