@@ -77,5 +77,4 @@ Because… Why not? Ever wondered what e-commerce would look like if it was all 
 Happy shopping! 🛒 (P.S. Don’t blame us if gas fees ruin the fun 🙈)
 
 
-<img src="resources/1.png" alt="Image 1" width="550" height="350">
-![Image 2](resources/1.png)
+<img src="resources/1.png" alt="Image 1" width="450" height="550">
