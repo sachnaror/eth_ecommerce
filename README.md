@@ -9,22 +9,30 @@ Welcome to **Eth-Ecom!** 🎈 Where shopping meets blockchain magic! 🪄 Dive i
 A quick peek at the treasure trove:
 
 ```
+eth_ecommerce/
 ├── eth_ecommerce/
-│   ├── requirements.txt
-│   ├── README.md
-│   ├── .env
-│   ├── manage.py
-│   ├── eth_ecommerce/
-│   │   ├── asgi.py
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   └── wsgi.py
-│   ├── store/
-│   │   ├── models.py
-│   │   ├── apps.py
-│   │   ├── admin.py
-│   │   ├── tests.py
-│   │   └── views.py
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+├── store/
+│   ├── migrations/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   │   └── store/
+│   │       └── product.html
+│   └── utils.py
+├── contracts/
+│   └── ProductMarket.sol
+├── manage.py
+└── requirements.txt
 
 ```
 
