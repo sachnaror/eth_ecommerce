@@ -7,43 +7,86 @@
 </head>
 <body>
     <h1>Product Store</h1>
+
+    <!-- Input fields for adding products -->
     <input type="text" id="productName" placeholder="Product Name">
     <input type="number" id="productPrice" placeholder="Product Price in Wei">
     <button onclick="addProduct()">Add Product</button>
+
+    <!-- Input fields for purchasing products -->
     <input type="number" id="productId" placeholder="Product ID to Purchase">
     <button onclick="purchaseProduct()">Purchase Product</button>
 
     <div id="result"></div>
 
     <script>
-        const contractAddress = "YOUR_CONTRACT_ADDRESS";
-        const contractABI = [ /* Contract ABI goes here */ ];
+        const contractAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with your actual contract address
+        const contractABI = [ /* Contract ABI goes here */ ]; // Replace with your contract ABI
 
-        const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        let web3;
+        let contract;
+        let userAccount;
 
+        // Check if MetaMask is installed and initialize web3
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                await connectMetaMask();
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+            } else {
+                alert('Please install MetaMask to use this app.');
+            }
+        }
+
+        // Connect to MetaMask
+        async function connectMetaMask() {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                console.log('Connected account:', userAccount);
+            } catch (error) {
+                console.error('User denied account access:', error);
+            }
+        }
+
+        // Function to add a product to the smart contract
         async function addProduct() {
             const name = document.getElementById("productName").value;
             const price = document.getElementById("productPrice").value;
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const account = accounts[0];
 
-            contract.methods.createProduct(name, price).send({ from: account })
-                .then(receipt => {
-                    document.getElementById("result").innerText = "Product added! Tx: " + receipt.transactionHash;
-                });
+            try {
+                const receipt = await contract.methods.createProduct(name, price).send({ from: userAccount });
+                document.getElementById("result").innerText = "Product added! Tx: " + receipt.transactionHash;
+            } catch (error) {
+                console.error('Error adding product:', error);
+                document.getElementById("result").innerText = "Error adding product: " + error.message;
+            }
         }
 
+        // Function to purchase a product
         async function purchaseProduct() {
             const productId = document.getElementById("productId").value;
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const account = accounts[0];
 
-            contract.methods.purchaseProduct(productId).send({ from: account, value: web3.utils.toWei("0.01", "ether") })
-                .then(receipt => {
-                    document.getElementById("result").innerText = "Purchase complete! Tx: " + receipt.transactionHash;
+            try {
+                const gasPrice = await web3.eth.getGasPrice(); // Get current gas price
+                const estimatedGas = await contract.methods.purchaseProduct(productId).estimateGas({ from: userAccount, value: web3.utils.toWei("0.01", "ether") });
+
+                const receipt = await contract.methods.purchaseProduct(productId).send({
+                    from: userAccount,
+                    value: web3.utils.toWei("0.01", "ether"),
+                    gas: estimatedGas,
+                    gasPrice: gasPrice
                 });
+
+                document.getElementById("result").innerText = "Purchase complete! Tx: " + receipt.transactionHash;
+            } catch (error) {
+                console.error('Error purchasing product:', error);
+                document.getElementById("result").innerText = "Error purchasing product: " + error.message;
+            }
         }
+
+        // Initialize the app when the page loads
+        window.onload = init;
     </script>
 </body>
 </html>
